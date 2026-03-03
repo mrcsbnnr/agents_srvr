@@ -78,7 +78,6 @@ services:
       interval: ${HC_INTERVAL_REDIS:-5s}
       timeout: ${HC_TIMEOUT_REDIS:-5s}
       retries: ${HC_RETRIES_REDIS:-10}
-      start_period: 10s
 
   n8n:
     <<: *shared
@@ -89,10 +88,10 @@ services:
       - "${N8N_PORT}:5678"
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5678/healthz || exit 1"]
-      interval: 20s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
+      interval: ${HC_INTERVAL_N8N:-30s}
+      timeout: ${HC_TIMEOUT_N8N:-10s}
+      retries: ${HC_RETRIES_N8N:-3}
+      start_period: ${HC_START_PERIOD_N8N:-60s}
 
   n8n-worker:
     <<: *shared
