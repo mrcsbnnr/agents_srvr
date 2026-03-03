@@ -53,10 +53,11 @@ services:
     networks:
       - HoloNet  
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -h localhost -U postgres -d n8n"]
       interval: ${HC_INTERVAL_POSTGRES:-5s}
       timeout: ${HC_TIMEOUT_POSTGRES:-5s}
       retries: ${HC_RETRIES_POSTGRES:-10}
+      start_period: 30s
 
   redis:
     image: ${REDIS_IMAGE:-redis:7-alpine}
