@@ -52,11 +52,6 @@ services:
       - ${HOST_INIT_DB_SCRIPT}:/docker-entrypoint-initdb.d/init-data.sh
     networks:
       - HoloNet  
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: ${HC_INTERVAL_POSTGRES:-5s}
-      timeout: ${HC_TIMEOUT_POSTGRES:-5s}
-      retries: ${HC_RETRIES_POSTGRES:-10}
 
   redis:
     image: ${REDIS_IMAGE:-redis:7-alpine}
@@ -72,11 +67,6 @@ services:
       - ${HOST_REDIS_STORAGE}:/data
     networks:
       - HoloNet
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "--no-auth-warning", "ping"]
-      interval: ${HC_INTERVAL_REDIS:-5s}
-      timeout: ${HC_TIMEOUT_REDIS:-5s}
-      retries: ${HC_RETRIES_REDIS:-10}
 
   n8n:
     <<: *shared
@@ -85,12 +75,6 @@ services:
     command: start
     ports:
       - "${N8N_PORT}:5678"
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5678/healthz || exit 1"]
-      interval: ${HC_INTERVAL_N8N:-30s}
-      timeout: ${HC_TIMEOUT_N8N:-10s}
-      retries: ${HC_RETRIES_N8N:-3}
-      start_period: ${HC_START_PERIOD_N8N:-60s}
 
   n8n-worker:
     <<: *shared
@@ -104,12 +88,6 @@ services:
         condition: service_healthy
       n8n:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://n8n:5678/healthz || exit 1"]
-      interval: ${HC_INTERVAL_N8N_WORKER:-30s}
-      timeout: ${HC_TIMEOUT_N8N_WORKER:-10s}
-      retries: ${HC_RETRIES_N8N_WORKER:-3}
-      start_period: ${HC_START_PERIOD_N8N_WORKER:-60s}
 
   waha:
     image: ${WAHA_IMAGE:-devlikeapro/waha:latest}
@@ -134,12 +112,6 @@ services:
     restart: unless-stopped 
     networks:
       - HoloNet
-    healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:3000/api || true; exit 0"]
-      interval: ${HC_INTERVAL_WAHA:-30s}
-      timeout: ${HC_TIMEOUT_WAHA:-10s}
-      retries: ${HC_RETRIES_WAHA:-3}
-      start_period: ${HC_START_PERIOD_WAHA:-90s}
 
   evolution:
     container_name: ${EVOLUTION_CONTAINER_NAME:-evolution}
@@ -175,12 +147,6 @@ services:
       - ${HOST_EVOLUTION_INSTANCES}:/evolution/instances
     networks:
       - HoloNet
-    healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080 || exit 1"]
-      interval: ${HC_INTERVAL_EVOLUTION:-30s}
-      timeout: ${HC_TIMEOUT_EVOLUTION:-10s}
-      retries: ${HC_RETRIES_EVOLUTION:-3}
-      start_period: ${HC_START_PERIOD_EVOLUTION:-60s}
 
 networks:
   HoloNet:
